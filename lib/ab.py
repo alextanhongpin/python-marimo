@@ -1,4 +1,5 @@
 import math
+
 import scipy.stats as st
 import statsmodels.stats.api as sm
 import statsmodels.stats.power as sp
@@ -13,18 +14,85 @@ def sample_size_for_mean_difference(delta, std, power=0.8, alpha=0.05, sides=1):
 
 
 def sample_size_for_proportions(
-    p1, p2, alpha=0.05, power=0.8, alternative="two-sided", ratio=1
+    p1, p2, alpha=0.05, power=0.8, alternative="two-sided", ratio=1, **kwargs
 ):
     return math.ceil(
         sm.samplesize_proportions_2indep_onetail(
-            p2 - p1, p1, power=power, alpha=alpha, alternative=alternative, ratio=ratio
+            p1 - p2,
+            p2,
+            power=power,
+            alpha=alpha,
+            alternative=alternative,
+            ratio=ratio,
+            **kwargs,
         )
     )
 
 
-def test_proportions_2indep(count1, count2, nobs1, nobs2, alternative="two-sided"):
+def confint_proportions_2indep(
+    count1: int,
+    nobs1: int,
+    count2: int,
+    nobs2: int,
+    method="agresti-caffo",
+    alpha=0.05,
+    correction=True,
+    **kwargs,
+):
+    return sm.confint_proportions_2indep(
+        count1,
+        nobs1,
+        count2,
+        nobs2,
+        method=method,
+        compare="diff",
+        alpha=alpha,
+        correction=correction,
+        **kwargs,
+    )
+
+
+def power_proportions_2indep(
+    p1,
+    p2,
+    nobs1,
+    nobs2,
+    alpha=0.05,
+    alternative="two-sided",
+    return_results=False,
+    **kwargs,
+):
+    return sm.power_proportions_2indep(
+        p1 - p2,
+        p2,
+        nobs1=nobs1,
+        ratio=nobs2 / nobs1,
+        alpha=alpha,
+        alternative=alternative,
+        return_results=return_results,
+        **kwargs,
+    )
+
+
+def test_proportions_2indep(
+    count1,
+    nobs1,
+    count2,
+    nobs2,
+    method="agresti-caffo",
+    alternative="two-sided",
+    return_results=False,
+    **kwargs,
+):
     stat, p_value = sm.test_proportions_2indep(
-        count1, nobs1, count2, nobs2, return_results=False, alternative=alternative
+        count1,
+        nobs1,
+        count2,
+        nobs2,
+        method=method,
+        return_results=return_results,
+        alternative=alternative,
+        **kwargs,
     )
 
     return stat, p_value

@@ -7,6 +7,7 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
+
     return (mo,)
 
 
@@ -25,7 +26,6 @@ def _(mo):
 @app.cell
 def _():
     import math
-
 
     print(math.sqrt(10))
     return (math,)
@@ -47,6 +47,7 @@ def _(x):
 @app.cell
 def _():
     import polars as pl
+
     return (pl,)
 
 
