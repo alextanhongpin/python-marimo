@@ -17,3 +17,11 @@ lint:
 	@uvx ruff format
 	@uvx ruff check --fix --select I
 	@uv run mypy . # uvx runs in separate virtual environment.
+
+
+build:
+	./build.sh
+
+run:
+	open http://localhost:8000
+	uv run python -m http.server 8000
