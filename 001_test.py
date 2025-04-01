@@ -7,7 +7,6 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-
     return (mo,)
 
 
@@ -47,7 +46,6 @@ def _(x):
 @app.cell
 def _():
     import polars as pl
-
     return (pl,)
 
 
@@ -62,10 +60,26 @@ def _(pl):
 def _(df, mo):
     _df = mo.sql(
         f"""
-        SELECT * FROM df
+        SELECT * 
+        FROM df
+        WHERE a = 1
         """
     )
     return
+
+
+@app.cell
+async def _(mo):
+    import asyncio
+
+    with mo.status.progress_bar(
+        total=10, title="fetching", subtitle="data", completion_title="done"
+    ) as bar:
+        for i in range(10):
+            if i == 0:
+                await asyncio.sleep(0.1)
+            bar.update()
+    return asyncio, bar, i
 
 
 if __name__ == "__main__":
