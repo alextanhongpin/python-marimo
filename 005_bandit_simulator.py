@@ -29,18 +29,24 @@ def _(mo):
 
 
 @app.cell
-def _(Bandit, arms_probs, np, px):
+def _(Bandit, arms_probs, np):
     probs = [float(p) for p in arms_probs.value.split(",")]
 
     n_arms = len(probs)
     bandit = Bandit(n_arms)
 
     x = np.linspace(0, 1.0, 100)
+    data = []
 
     for i in range(100):
         arm = bandit.pull()
         reward = np.random.random() < probs[arm]
         bandit.update(arm, reward)
+
+        for ai in range(n_arms):
+            y = bandit.beta_pdf(x, ai)
+            for xi, yi in zip(x, y):
+                data.append((i, ai, xi, yi))
 
     for arm in range(n_arms):
         success, failure = bandit.engagements[arm] + 1
@@ -48,23 +54,12 @@ def _(Bandit, arms_probs, np, px):
         print(
             f"Arm {arm} (prob={probs[arm]}) has a success rate of {success / impressions} ({int(success)} / {int(failure)})"
         )
-
-
-    fig = px.line(
-        x=x,
-        y=[bandit.beta_pdf(x, arm) for arm in range(n_arms)],
-        title="Arm distribution",
-        # labels=[] doesn't work
-    )
-    for arm in range(n_arms):
-        fig.data[arm].name = f"arm {arm + 1}"
-
-    fig
     return (
+        ai,
         arm,
         bandit,
+        data,
         failure,
-        fig,
         i,
         impressions,
         n_arms,
@@ -72,7 +67,34 @@ def _(Bandit, arms_probs, np, px):
         reward,
         success,
         x,
+        xi,
+        y,
+        yi,
     )
+
+
+@app.cell
+def _(data, pl):
+    df = pl.from_records(
+        [dict(i=i, arm=arm, x=xi, y=yi) for (i, arm, xi, yi) in data]
+    )
+    return (df,)
+
+
+@app.cell
+def _(df, px):
+    fig = px.line(
+        df,
+        x="x",
+        y="y",
+        color="arm",
+        animation_group="arm",
+        animation_frame="i",
+        range_x=[0, 1],
+        range_y=[0, 10],
+    )
+    fig
+    return (fig,)
 
 
 if __name__ == "__main__":
