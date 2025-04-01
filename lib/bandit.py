@@ -22,7 +22,6 @@ class Bandit:
     def beta(self, arm: int):
         s, f = self.engagements[arm]
         i = self.impressions[arm] / 10  # Add penalty to impressions.
-        print(s, f, i)
 
         return np.random.beta(s + i + 1, f + i + 1)
 
