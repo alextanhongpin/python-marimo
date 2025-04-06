@@ -66,12 +66,12 @@ def _(anywidget, mo, traitlets):
         function render({ model, el }) {
             const img = document.createElement('img')
             const div = document.createElement('div')
-        
+
             img.src = model.get('value')
             img.onload = function() {
                 div.innerHTML = img.width + " " + img.height
             }       
-        
+
             el.appendChild(img)
             el.appendChild(div)
 
@@ -252,7 +252,7 @@ def _(anywidget, traitlets):
                 ctx.strokeStyle = 'red';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-                
+
                 ctx.fillStyle = 'red';
                 ctx.font = '14px Arial';
                 ctx.fillText(label, boundingBox.x + 5, boundingBox.y - 5);
@@ -263,7 +263,7 @@ def _(anywidget, traitlets):
                   ctx.strokeStyle = 'blue';
                   ctx.lineWidth = 2;
                   ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
-              
+
                   ctx.fillStyle = 'blue';
                   ctx.font = '14px Arial';
                   ctx.fillText(label, Math.min(startX, currentX) + 5, Math.min(startY, currentY) - 5);
@@ -308,7 +308,7 @@ def _(anywidget, traitlets):
               ctx.strokeStyle = 'red';
               ctx.lineWidth = 2;
               ctx.strokeRect(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height);
-          
+
               ctx.fillStyle = 'red';
               ctx.font = '14px Arial';
               ctx.fillText(label, boundingBox.x + 5, boundingBox.y - 5);
@@ -403,7 +403,7 @@ def _(ImageAnnotator, mo):
 
     def handle_submit(value):
         if not marker.boundingBox:
-            raise ValueError('bounding box is required')
+            raise ValueError("bounding box is required")
         print(not marker.boundingBox)
         print(radio.value)
         print(marker.boundingBox)
@@ -435,13 +435,38 @@ def _(ImageAnnotator, mo):
 
 @app.cell
 def _(image_path, load_base64_image, marker, radio):
-    marker.value = load_base64_image(str(image_path / radio.value))
+    marker.value = (
+        load_base64_image(str(image_path / radio.value)) if radio.value else ""
+    )
     return
 
 
 @app.cell
 def _(marker):
     marker.boundingBox
+    return
+
+
+@app.cell
+def _(mo):
+    form = (
+        mo.md("""
+    ## My form
+
+    Your name: {name}
+
+    Your age: {age}
+    """)
+        .batch(name=mo.ui.text(placeholder="Your name"), age=mo.ui.number())
+        .form()
+    )
+    form
+    return (form,)
+
+
+@app.cell
+def _(form):
+    form.value
     return
 
 

@@ -12,3 +12,4 @@ wheels/
 # Output.
 site/
 tags
+**/.DS_Store
